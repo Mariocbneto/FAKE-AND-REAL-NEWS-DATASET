@@ -7,7 +7,6 @@ import pickle
 from newspaper import Article
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-
 # --- CARREGA MODELO E TOKENIZER ---
 modelo = tf.keras.models.load_model("models/modelo_fake_news.h5")
 
@@ -47,7 +46,7 @@ def predict(noticia: NoticiaInput):
         artigo.download()
         artigo.parse()
     except:
-        return {"erro": "Não foi possível baixar ou ler a notícia"}
+        return {"erro": "URL inválida ou artigo não pôde ser lido"}
 
     texto = (artigo.title or "") + " " + (artigo.text or "")
     texto_limpo = clean_text(texto)
@@ -57,8 +56,8 @@ def predict(noticia: NoticiaInput):
 
     prob = modelo.predict(sequencia)[0][0]
     resultado = "FAKE" if prob > 0.5 else "REAL"
+    confianca = prob if prob > 0.5 else 1 - prob  # Ajuste aqui
 
-    return {"resultado": resultado, "probabilidade": float(prob)}
+    return {"resultado": resultado, "probabilidade": float(confianca)}
 
-
-#uvicorn api.main:app --reload
+# Para rodar: uvicorn api.main:app --reload

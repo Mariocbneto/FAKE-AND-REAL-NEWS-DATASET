@@ -59,3 +59,6 @@ def predict(noticia: NoticiaInput):
     resultado = "FAKE" if prob > 0.5 else "REAL"
 
     return {"resultado": resultado, "probabilidade": float(prob)}
+
+
+#uvicorn api.main:app --reload

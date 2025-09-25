@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import tensorflow as tf
 import numpy as np
@@ -6,28 +8,35 @@ import re
 import pickle
 from newspaper import Article
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import os
+from fastapi.middleware.cors import CORSMiddleware
 
 # --- CARREGA MODELO E TOKENIZER ---
 modelo = tf.keras.models.load_model("models/modelo_fake_news.h5")
-
 with open("models/tokenizer.pkl", "rb") as handle:
     tokenizer = pickle.load(handle)
-
-MAXLEN = 300  # Mesmo valor usado no treino
+MAXLEN = 300
 
 # --- FASTAPI ---
 app = FastAPI()
 
-# --- MIDDLEWARE CORS ---
-from fastapi.middleware.cors import CORSMiddleware
+origins = ["*"]  # "*" permite qualquer origem, ideal pra teste local
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permite qualquer origem (teste local)
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["*"],  # permite POST, GET, OPTIONS...
     allow_headers=["*"],
 )
+
+
+# Servir arquivos estáticos (HTML, CSS, JS)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+def home():
+    return FileResponse("static/index.html")
 
 class NoticiaInput(BaseModel):
     url: str
@@ -46,7 +55,7 @@ def predict(noticia: NoticiaInput):
         artigo.download()
         artigo.parse()
     except:
-        return {"erro": "URL inválida ou artigo não pôde ser lido"}
+        return {"erro": "Não foi possível baixar ou ler a notícia"}
 
     texto = (artigo.title or "") + " " + (artigo.text or "")
     texto_limpo = clean_text(texto)
@@ -56,8 +65,5 @@ def predict(noticia: NoticiaInput):
 
     prob = modelo.predict(sequencia)[0][0]
     resultado = "FAKE" if prob > 0.5 else "REAL"
-    confianca = prob if prob > 0.5 else 1 - prob  # Ajuste aqui
 
-    return {"resultado": resultado, "probabilidade": float(confianca)}
-
-# Para rodar: uvicorn api.main:app --reload
+    return {"resultado": resultado, "probabilidade": float(prob)}

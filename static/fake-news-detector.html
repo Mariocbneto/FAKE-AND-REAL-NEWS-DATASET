@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fake News Detector - AI-Powered News Verification</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* Animated background particles */
+      .bg-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+      }
+
+      .particle {
+        position: absolute;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+      }
+
+      .particle:nth-child(1) {
+        width: 80px;
+        height: 80px;
+        left: 10%;
+        animation-delay: 0s;
+      }
+      .particle:nth-child(2) {
+        width: 60px;
+        height: 60px;
+        left: 20%;
+        animation-delay: 1s;
+      }
+      .particle:nth-child(3) {
+        width: 40px;
+        height: 40px;
+        left: 70%;
+        animation-delay: 2s;
+      }
+      .particle:nth-child(4) {
+        width: 100px;
+        height: 100px;
+        left: 80%;
+        animation-delay: 3s;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        animation: slideUp 0.8s ease-out;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .header {
+        margin-bottom: 30px;
+      }
+
+      .logo {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 10px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      h1 {
+        color: #333;
+        font-size: 2rem;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 1rem;
+        margin-bottom: 20px;
+      }
+
+      .warning {
+        background: linear-gradient(45deg, #ff6b6b, #ffa500);
+        color: white;
+        padding: 12px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        animation: glow 2s ease-in-out infinite alternate;
+      }
+
+      @keyframes glow {
+        from {
+          box-shadow: 0 0 5px rgba(255, 107, 107, 0.5);
+        }
+        to {
+          box-shadow: 0 0 20px rgba(255, 107, 107, 0.8);
+        }
+      }
+
+      .input-group {
+        position: relative;
+        margin-bottom: 25px;
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 1.2rem;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 15px 15px 15px 50px;
+        border: 2px solid #e1e5e9;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .btn-container {
+        margin-bottom: 25px;
+      }
+
+      button {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        min-width: 150px;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+      }
+
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+
+      #resultado {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.5s ease;
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      #resultado.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .resultado-loading {
+        background: linear-gradient(45deg, #f39c12, #e67e22);
+        color: white;
+        animation: loadingPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes loadingPulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .resultado-real {
+        background: linear-gradient(45deg, #27ae60, #2ecc71);
+        color: white;
+        animation: successBounce 0.6s ease-out;
+      }
+
+      .resultado-fake {
+        background: linear-gradient(45deg, #e74c3c, #c0392b);
+        color: white;
+        animation: errorShake 0.6s ease-out;
+      }
+
+      .resultado-error {
+        background: linear-gradient(45deg, #95a5a6, #7f8c8d);
+        color: white;
+      }
+
+      @keyframes successBounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+
+      @keyframes errorShake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .footer {
+        margin-top: 30px;
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      .tech-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin: 5px;
+      }
+
+      /* Responsive design */
+      @media (max-width: 600px) {
+        .container {
+          padding: 30px 20px;
+          margin: 10px;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        .logo {
+          font-size: 2.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg-animation">
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+      <div class="particle"></div>
+    </div>
+
+    <div class="container">
+      <div class="header">
+        <div class="logo">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1>Fake News Detector</h1>
+        <p class="subtitle">AI-Powered News Verification System</p>
+      </div>
+
+      <div class="warning">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>Currently supports US news sources only</span>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-link input-icon"></i>
+        <input
+          type="text"
+          id="urlInput"
+          placeholder="Paste the news article URL here..."
+        />
+      </div>
+
+      <div class="btn-container">
+        <button onclick="verificarNoticia()" id="verifyBtn">
+          <i class="fas fa-search"></i> Verify News
+        </button>
+      </div>
+
+      <div id="resultado"></div>
+
+      <div class="footer">
+        <div class="tech-badge">
+          <i class="fas fa-robot"></i>
+          AI Powered
+        </div>
+        <div class="tech-badge">
+          <i class="fas fa-bolt"></i>
+          Real-time
+        </div>
+        <div class="tech-badge">
+          <i class="fas fa-shield-check"></i>
+          Secure
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Função ripple do botão
+      function createRipple(event) {
+        const button = event.currentTarget;
+        const circle = document.createElement("span");
+        const diameter = Math.max(button.clientWidth, button.clientHeight);
+        const radius = diameter / 2;
+
+        circle.style.width = circle.style.height = `${diameter}px`;
+        circle.style.left = `${event.clientX - button.offsetLeft - radius}px`;
+        circle.style.top = `${event.clientY - button.offsetTop - radius}px`;
+        circle.classList.add("btn-ripple");
+
+        const ripple = button.getElementsByClassName("btn-ripple")[0];
+        if (ripple) ripple.remove();
+
+        button.appendChild(circle);
+      }
+
+      document
+        .getElementById("verifyBtn")
+        .addEventListener("click", createRipple);
+
+      async function verificarNoticia() {
+        const url = document.getElementById("urlInput").value.trim();
+        const resultadoDiv = document.getElementById("resultado");
+        const verifyBtn = document.getElementById("verifyBtn");
+
+        if (!url) {
+          const input = document.getElementById("urlInput");
+          input.style.animation = "errorShake 0.6s ease-out";
+          setTimeout(() => (input.style.animation = ""), 600);
+          resultadoDiv.className = "resultado-error show";
+          resultadoDiv.innerHTML =
+            '<i class="fas fa-exclamation-circle"></i> Please paste a valid URL!';
+          return;
+        }
+
+        try {
+          new URL(url);
+        } catch (e) {
+          resultadoDiv.className = "resultado-error show";
+          resultadoDiv.innerHTML =
+            '<i class="fas fa-exclamation-circle"></i> Please enter a valid URL format!';
+          return;
+        }
+
+        // Loading
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML =
+          '<div class="loading-spinner"></div> Analyzing...';
+        resultadoDiv.className = "resultado-loading show";
+        resultadoDiv.innerHTML =
+          '<div class="loading-spinner"></div> Analyzing article with AI...';
+
+        try {
+          const response = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ url: url }),
+          });
+
+          if (!response.ok)
+            throw new Error(`HTTP error! status: ${response.status}`);
+
+          const data = await response.json();
+          setTimeout(() => {
+            const probability = (data.probabilidade * 100).toFixed(1);
+            const isReal = data.resultado.toLowerCase().includes("real");
+
+            if (isReal) {
+              resultadoDiv.className = "resultado-real show";
+              resultadoDiv.innerHTML = `
+                        <div>
+                            <i class="fas fa-check-circle" style="font-size:1.5rem; margin-bottom:10px;"></i><br>
+                            <strong>REAL NEWS</strong><br>
+                            <span style="font-size:0.9rem;">Confidence: ${probability}%</span>
+                        </div>
+                    `;
+            } else {
+              resultadoDiv.className = "resultado-fake show";
+              resultadoDiv.innerHTML = `
+                        <div>
+                            <i class="fas fa-times-circle" style="font-size:1.5rem; margin-bottom:10px;"></i><br>
+                            <strong>FAKE NEWS</strong><br>
+                            <span style="font-size:0.9rem;">Confidence: ${probability}%</span>
+                        </div>
+                    `;
+            }
+          }, 1000);
+        } catch (err) {
+          console.error("Error:", err);
+          resultadoDiv.className = "resultado-error show";
+          resultadoDiv.innerHTML = `
+                <div>
+                    <i class="fas fa-exclamation-triangle" style="font-size:1.5rem; margin-bottom:10px;"></i><br>
+                    <strong>Connection Error</strong><br>
+                    <span style="font-size:0.9rem;">Unable to connect to the API server</span>
+                </div>
+            `;
+        } finally {
+          setTimeout(() => {
+            verifyBtn.disabled = false;
+            verifyBtn.innerHTML = '<i class="fas fa-search"></i> Verify News';
+          }, 1000);
+        }
+      }
+
+      // Enter key triggers verification
+      document
+        .getElementById("urlInput")
+        .addEventListener("keypress", function (event) {
+          if (event.key === "Enter") verificarNoticia();
+        });
+
+      // Input focus animation
+      document
+        .getElementById("urlInput")
+        .addEventListener("focus", function () {
+          this.parentElement.style.transform = "scale(1.02)";
+        });
+      document.getElementById("urlInput").addEventListener("blur", function () {
+        this.parentElement.style.transform = "scale(1)";
+      });
+    </script>
+  </body>
+</html>

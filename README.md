@@ -1,4 +1,4 @@
-# Fake News App Via Docker / Necessario Docker Desktop 
+# Fake News App Via Docker
 
 ## Requisitos
 - Docker instalado
@@ -13,11 +13,15 @@ docker build -t fake-news-app .
 docker run -p 8000:8000 fake-news-app
 
 Depois abra no navegador: http://127.0.0.1:8000/docs
+```
 
 
-Fake News App Via Local / Necessário baixar requeriments.txt / pip install -r requirements.txt
+# Fake News App Via Local 
 
-Como rodar
+## Requesitos
+- pip install -r requirements.txt
+
+## Como rodar
 No arquivo main.py execute:
 uvicorn api.main:app --reload
 

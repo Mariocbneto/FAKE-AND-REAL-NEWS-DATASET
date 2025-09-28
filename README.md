@@ -7,7 +7,7 @@
 Abra o terminal e execute:
 
 ```bash
-git clone https://github.com/seu-usuario/fake-and-real-news-dataset.git
+git clone https://github.com/Mariocbneto/FAKE-AND-REAL-NEWS-DATASET.git
 cd fake-and-real-news-dataset
 docker build -t fake-news-app .
 docker run -p 8000:8000 fake-news-app
